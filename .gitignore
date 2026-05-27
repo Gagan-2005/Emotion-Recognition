@@ -1,0 +1,19 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.idea/
+.vscode/
+node_modules/
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Keep the submission lightweight; generated caches are recreated on demand.
+project/__pycache__/

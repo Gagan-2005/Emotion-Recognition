@@ -1,0 +1,4 @@
+variant,accuracy
+multimodal_fusion,0.9982142857142857
+speech_only,0.9982142857142857
+text_only,0.0

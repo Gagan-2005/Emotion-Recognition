@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multimodal Emotion Recognition</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#predict">
+        <span class="brand-mark">MER</span>
+        <span>
+          <strong>Multimodal Emotion Recognition</strong>
+          <small>TESS speech analytics</small>
+        </span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#predict">Predict</a>
+        <a href="#results">Results</a>
+        <a href="#analysis">Analysis</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="predict">
+        <div class="hero-copy">
+          <p class="eyebrow">Speech only • Text only • Multimodal fusion</p>
+          <h1>Recognize emotion from speech, text, or both.</h1>
+          <p class="hero-text">
+            Explore speech emotion patterns, weak text-only signals, and strong multimodal fusion results for TESS in a polished analytics workspace.
+          </p>
+          <div class="status-strip" id="modelStatus">
+            <span class="pulse"></span>
+            <span>Checking trained model artifacts...</span>
+          </div>
+        </div>
+
+        <form class="predictor" id="predictForm" novalidate>
+          <div class="mode-tabs" role="tablist" aria-label="Model variant">
+            <button type="button" class="mode-tab active" data-variant="speech_only">Speech</button>
+            <button type="button" class="mode-tab" data-variant="text_only">Text</button>
+            <button type="button" class="mode-tab" data-variant="multimodal_fusion">Fusion</button>
+          </div>
+
+          <div class="field audio-field">
+            <span>WAV audio sample</span>
+            <small>Use your microphone to record a live speech sample. Record 3-10 seconds for better emotion prediction.</small>
+            <div class="audio-sources">
+              <div class="upload-zone" id="uploadZone">
+                <input id="audioInput" name="audio" type="file" accept=".wav,audio/wav" />
+                <div class="upload-copy">
+                  <strong>Drag and drop a WAV sample</strong>
+                  <small id="fileName">Select a TESS-style WAV file.</small>
+                </div>
+              </div>
+              <div class="record-card" id="recordCard">
+                <div class="record-header">
+                  <div>
+                    <strong>Record Voice</strong>
+                    <small>Speech and fusion models analyze acoustic emotional cues.</small>
+                  </div>
+                  <div class="record-indicator" id="recordIndicator" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+
+                <div class="record-controls">
+                  <button type="button" class="record-button" id="recordStart">Start Recording</button>
+                  <button type="button" class="record-button ghost" id="recordStop" disabled>Stop Recording</button>
+                  <button type="button" class="record-button ghost danger" id="recordReset" disabled>Delete</button>
+                </div>
+
+                <div class="record-meta">
+                  <span class="record-timer" id="recordTimer">00:00</span>
+                  <small id="recordStatus">Use your microphone to record a live speech sample.</small>
+                </div>
+
+                <div class="waveform" id="waveform" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <audio class="record-preview" id="recordPreview" controls hidden></audio>
+              </div>
+            </div>
+            <small>Speech and fusion models analyze acoustic emotional cues from either uploaded or recorded audio.</small>
+          </div>
+
+          <label class="field text-field" for="transcriptInput">
+            <span>Transcript word</span>
+            <input id="transcriptInput" name="transcript" type="text" autocomplete="off" value="back" />
+            <small>Use the spoken word from the filename, for example back, bar, base, or bath.</small>
+          </label>
+
+          <button class="primary-action" type="submit">
+            <span class="button-label">Run prediction</span>
+            <span aria-hidden="true">→</span>
+          </button>
+
+          <div class="message" id="formMessage" role="status" aria-live="polite"></div>
+
+          <section class="prediction-output" id="predictionOutput" hidden>
+            <div>
+              <span class="result-kicker">Predicted emotion</span>
+              <strong id="predictionLabel">Neutral</strong>
+            </div>
+            <div class="confidence-list" id="confidenceList"></div>
+          </section>
+        </form>
+      </section>
+
+      <section class="metrics-band" aria-label="Accuracy summary">
+        <div class="metric-tile">
+          <span>Speech-only</span>
+          <strong id="speechAccuracy">--</strong>
+        </div>
+        <div class="metric-tile">
+          <span>Text-only</span>
+          <strong id="textAccuracy">--</strong>
+        </div>
+        <div class="metric-tile">
+          <span>Fusion</span>
+          <strong id="fusionAccuracy">--</strong>
+        </div>
+      </section>
+
+      <section class="section" id="results">
+        <div class="section-heading">
+          <p class="eyebrow">Model performance comparison</p>
+          <h2>Performance summary and visual analysis</h2>
+        </div>
+
+        <div class="results-grid">
+          <article class="panel table-panel">
+            <div class="panel-head">
+              <h3>Model performance comparison</h3>
+              <span>Speech-only, text-only, and fusion accuracy from Results/accuracy_tables.csv</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Variant</th>
+                    <th>Accuracy</th>
+                  </tr>
+                </thead>
+                <tbody id="accuracyTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <h3>Speech-only analysis</h3>
+              <select id="reportSelect" aria-label="Choose report">
+                <option value="speech_only">Speech-only</option>
+                <option value="text_only">Text-only</option>
+                <option value="multimodal_fusion">Fusion</option>
+              </select>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <div class="plot-toolbar" role="tablist" aria-label="Plot variant">
+          <button type="button" class="plot-tab active" data-plot="speech_only">Speech</button>
+          <button type="button" class="plot-tab" data-plot="text_only">Text</button>
+          <button type="button" class="plot-tab" data-plot="multimodal_fusion">Fusion</button>
+        </div>
+
+        <div class="plot-grid">
+          <figure class="plot-frame">
+            <figcaption>Confusion Matrix Analysis</figcaption>
+            <img id="confusionPlot" alt="Confusion matrix plot" />
+          </figure>
+          <figure class="plot-frame">
+            <figcaption>Emotion Cluster Visualization</figcaption>
+            <img id="clusterPlot" alt="Representation PCA plot" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="section analysis" id="analysis">
+        <div class="section-heading">
+          <p class="eyebrow">Project insights</p>
+          <h2>Acoustic vs semantic understanding</h2>
+        </div>
+        <div class="analysis-grid">
+          <article>
+            <span class="chip speech">Speech</span>
+            <h3>Speech-only analysis</h3>
+            <p>Pitch, energy, rhythm, and voice quality create clear emotion cues, which is why acoustic features perform strongly on TESS.</p>
+          </article>
+          <article>
+            <span class="chip text">Text</span>
+            <h3>Text-only insights</h3>
+            <p>The transcript words are short and repeated across emotions, so semantic features are useful for comparison but remain weak on this dataset.</p>
+          </article>
+          <article>
+            <span class="chip fusion">Fusion</span>
+            <h3>Fusion representation</h3>
+            <p>The multimodal pipeline combines acoustic and transcript cues, but in TESS the acoustic representation still carries most of the separation power.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
